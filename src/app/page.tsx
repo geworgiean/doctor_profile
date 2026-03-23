@@ -50,7 +50,7 @@ export default function Home() {
     const userId = session?.user?.id;
 
     try {
-      const fileName = `diploma-${userId}-${Date.now()}.pdf`;
+      const fileName = `${userId}/diploma-${Date.now()}.pdf`;
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('doctor-documents')
