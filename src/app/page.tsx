@@ -3,13 +3,15 @@ import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { supabase } from "../../lib/supabase";
 import { saveDoctorProfile } from "@/app/actions/profile";
+import { useRouter } from "next/navigation";
+
 
 export default function Home() {
   const { data: session, status } = useSession();
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
-  // Եթե սեսիան դեռ ստուգվում է
   if (status === "loading") {
     return (
       <div className="flex items-center justify-center min-h-screen bg-slate-50">
@@ -18,7 +20,6 @@ export default function Home() {
     );
   }
 
-  // Եթե մարդը Login չի եղել
   if (!session) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 px-4">
@@ -32,7 +33,6 @@ export default function Home() {
             onClick={() => signIn("google")}
             className="w-full bg-slate-900 hover:bg-black text-white font-semibold py-3 rounded-xl transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3"
           >
-            {/* Պարզ Google Icon-ի նմանակում */}
             <svg className="w-5 h-5" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></svg>
             Մուտք գործել Google-ով
           </button>
@@ -41,17 +41,17 @@ export default function Home() {
     );
   }
 
-  // Ֆորմայի ուղարկումը
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!file) return alert("Խնդրում ենք ընտրել PDF ֆայլը");
 
     setLoading(true);
     const formData = new FormData(e.currentTarget);
-    const userId = session.user.id; 
+    const userId = session?.user?.id;
 
     try {
       const fileName = `diploma-${userId}-${Date.now()}.pdf`;
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('doctor-documents')
         .upload(fileName, file);
@@ -70,10 +70,12 @@ export default function Home() {
         documentUrl: publicUrl,
       });
 
-      alert("Պրոֆիլը հաջողությամբ ստեղծվեց");
-    } catch (error) {
+      alert("Պրոֆիլը հաջողությամբ պահպանվեց");
+      router.push("/dashboard");
+
+    } catch (error: any) {
       console.error(error);
-      alert("Սխալ տեղի ունեցավ");
+      alert(error.message || "Սխալ տեղի ունեցավ");
     } finally {
       setLoading(false);
     }
@@ -81,7 +83,6 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-slate-50 flex flex-col items-center">
-      {/* Header / Navbar */}
       <nav className="w-full bg-white border-b border-slate-200 py-4 px-6 md:px-10 flex justify-between items-center shadow-sm sticky top-0 z-10">
         <h1 className="text-2xl font-bold text-blue-600 tracking-tight italic">MediProfile</h1>
         <div className="flex items-center gap-4 border border-slate-100 bg-slate-50 px-4 py-2 rounded-full">
@@ -95,7 +96,6 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Ֆորմայի Կոնտեյներ */}
       <div className="grow w-full flex justify-center items-center p-4 md:p-10">
         <div className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-lg border border-slate-100">
           
@@ -108,7 +108,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">Անուն</label>
-                    <input name="firstName" placeholder="Արմեն" required className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition bg-white" />
+                    <input name="firstName" placeholder="Արման" required className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition bg-white" />
                 </div>
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1.5">Ազգանուն</label>
@@ -121,7 +121,6 @@ export default function Home() {
               <input name="specialty" placeholder="օր. Սիրտ-անոթային վիրաբույժ" required className="w-full px-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:outline-none transition bg-white" />
             </div>
             
-            {/* Ֆայլի Input-ի սիրունացում */}
             <div className="bg-slate-50 p-5 rounded-xl border-2 border-dashed border-slate-300 hover:border-blue-400 transition-colors group">
               <label className="block text-sm font-semibold text-slate-800 mb-2.5">Բժշկական դիպլոմ (PDF տարբերակ)</label>
               <input 
