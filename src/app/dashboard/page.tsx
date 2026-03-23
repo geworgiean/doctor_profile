@@ -7,66 +7,45 @@ export default async function DashboardPage() {
 
   if (!session) redirect("/");
 
+  // Քաշում ենք բժշկի պրոֆիլը բազայից
   const profile = await db.profile.findUnique({
     where: { userId: session.user.id },
   });
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-2xl shadow-lg text-center border border-slate-100 max-w-sm">
-          <p className="text-slate-600 mb-6">Դուք դեռ չունեք ստեղծված պրոֆիլ։</p>
-          <a href="/" className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
-            Լրացնել հիմա
-          </a>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-slate-600 mb-4">Դուք դեռ չունեք ստեղծված պրոֆիլ:</p>
+        <a href="/" className="bg-blue-600 text-white px-6 py-2 rounded-lg">Լրացնել հիմա</a>
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex flex-col items-center p-6 md:p-12">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-        <div className="bg-blue-600 p-8 text-white">
-          <h1 className="text-3xl font-bold">Բժշկի Պրոֆիլ</h1>
-          <p className="opacity-80 mt-2">Ձեր մասնագիտական տվյալները</p>
-        </div>
-
-        <div className="p-8 space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label className="text-xs uppercase tracking-wider text-slate-400 font-bold">Անուն</label>
-              <p className="text-lg font-semibold text-slate-800 border-b pb-1">{profile.firstName}</p>
-            </div>
-            <div>
-              <label className="text-xs uppercase tracking-wider text-slate-400 font-bold">Ազգանուն</label>
-              <p className="text-lg font-semibold text-slate-800 border-b pb-1">{profile.lastName}</p>
-            </div>
+    <main className="min-h-screen bg-slate-50 p-8">
+      <div className="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+        <h1 className="text-3xl font-bold text-slate-900 mb-6">Իմ Պրոֆիլը</h1>
+        
+        <div className="space-y-4">
+          <div className="border-b pb-2">
+            <span className="text-sm text-slate-500">Անուն Ազգանուն</span>
+            <p className="text-lg font-medium">{profile.firstName} {profile.lastName}</p>
+          </div>
+          
+          <div className="border-b pb-2">
+            <span className="text-sm text-slate-500">Մասնագիտացում</span>
+            <p className="text-lg font-medium">{profile.specialty}</p>
           </div>
 
-          <div>
-            <label className="text-xs uppercase tracking-wider text-slate-400 font-bold">Մասնագիտացում</label>
-            <p className="text-lg font-semibold text-slate-800 border-b pb-1">{profile.specialty}</p>
-          </div>
-
-          <div className="bg-slate-50 p-6 rounded-xl border border-slate-200 flex items-center justify-between">
-            <div>
-              <p className="font-bold text-slate-700">Բժշկական դիպլոմ</p>
-              <p className="text-sm text-slate-500">Վերբեռնված PDF ֆայլ</p>
-            </div>
+          <div className="pt-4">
             <a 
               href={profile.documentUrl} 
               target="_blank" 
-              className="bg-white border border-blue-600 text-blue-600 px-5 py-2 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
+              className="inline-flex items-center gap-2 bg-slate-900 text-white px-6 py-3 rounded-xl hover:bg-black transition"
             >
-              👁️ Դիտել
+              📄 Դիտել Դիպլոմը (PDF)
             </a>
           </div>
-        </div>
-
-        <div className="bg-slate-50 px-8 py-4 flex justify-between items-center border-t">
-            <a href="/" className="text-sm text-slate-500 hover:text-blue-600 transition underline">Խմբագրել (Շուտով)</a>
-            <p className="text-xs text-slate-400 font-mono">ID: {profile.userId}</p>
         </div>
       </div>
     </main>
