@@ -7,7 +7,6 @@ export default async function DashboardPage() {
 
   if (!session) redirect("/");
 
-  // Քաշում ենք բժշկի պրոֆիլը բազայից
   const profile = await db.profile.findUnique({
     where: { userId: session.user.id },
   });

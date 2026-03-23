@@ -72,13 +72,14 @@ export default function Home() {
 
       alert("Պրոֆիլը հաջողությամբ պահպանվեց");
       router.push("/dashboard");
-
+      router.refresh();
     } catch (error: any) {
       console.error(error);
       alert(error.message || "Սխալ տեղի ունեցավ");
     } finally {
       setLoading(false);
     }
+    
   };
 
   return (
