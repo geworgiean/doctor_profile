@@ -2,10 +2,12 @@
 import { useState } from "react";
 import { supabase } from "../../lib/supabase";
 import { saveDoctorProfile } from "@/app/actions/profile";
+import { useRouter } from "next/navigation";
 
 export default function DoctorProfileForm({ userId }: { userId: string }) {
   const [file, setFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter(); 
 
   const handleUpload = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,11 +18,14 @@ export default function DoctorProfileForm({ userId }: { userId: string }) {
 
     try {
       const fileName = `diploma-${userId}-${Date.now()}.pdf`;
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('doctor-documents')
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('doctor-documents')
@@ -35,9 +40,13 @@ export default function DoctorProfileForm({ userId }: { userId: string }) {
       });
 
       alert("Պրոֆիլը հաջողությամբ պահպանվեց:");
-    } catch (error) {
-      console.error(error);
-      alert("Սխալ տեղի ունեցավ վերբեռնման ժամանակ");
+
+      router.push("/dashboard"); 
+      router.refresh();
+
+    } catch (error: any) {
+      console.error("Upload error details:", error);
+      alert(`Սխալ: ${error.message || "Տեղի ունեցավ անհայտ սխալ"}`);
     } finally {
       setLoading(false);
     }
