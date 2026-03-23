@@ -4,7 +4,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db";
 
 const handler = NextAuth({
-  adapter: PrismaAdapter(prisma), // Սա կստեղծի User-ին բազայում ավտոմատ
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -14,7 +14,7 @@ const handler = NextAuth({
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
-        (session.user as any).id = user.id; // Սա կտա բազայի իսկական ID-ն
+        (session.user as any).id = user.id;
       }
       return session;
     },
