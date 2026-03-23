@@ -89,7 +89,7 @@ export default function Home() {
         <button 
           type="submit" 
           disabled={loading} 
-          className="bg-green-600 text-white p-2 rounded hover:bg-green-700 transition"
+          className="bg-green-700 text-white p-2 rounded hover:bg-green-700 transition"
         >
           {loading ? "Պահպանվում է..." : "Պահպանել"}
         </button>
